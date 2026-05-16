@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mã Vòng C(l,k)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--a:#1a4f3a;--a2:#2d7a58;--a3:#d4f5e4;--w:#7a2d0a;--wb:#fce8dd;--g:#f4f3ee;--g2:#e8e6df;--bd:#ccc;--mn:'Courier New',monospace}
+body{font:16px/1.6 'Courier New',monospace;background:var(--g);color:#111;padding:12px}
+h2{font:600 17px/1 'Courier New',monospace;margin-bottom:16px;color:var(--a)}
+.tabs{display:flex;gap:4px;margin-bottom:16px}
+.tab{padding:5px 14px;border:1px solid var(--bd);border-radius:4px;background:#fff;cursor:pointer;font-size:15px;font-family:var(--mn)}
+.tab.on{background:var(--a);color:#fff;border-color:var(--a)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
+.f{display:flex;flex-direction:column;gap:3px}
+.f label{font-size:14px;color:#222;font-family:var(--mn)}
+.f input{font-family:var(--mn);font-size:16px;padding:5px 8px;border:1px solid var(--bd);border-radius:4px;background:#fff}
+.f.w60 input{width:60px}.f.w180 input{width:200px}.f.w260 input{width:260px}
+.exs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.ex{font-family:var(--mn);font-size:13px;padding:3px 9px;border:1px solid var(--bd);border-radius:12px;background:#fff;cursor:pointer}
+.ex:hover{background:var(--a);color:#fff;border-color:var(--a)}
+.modes{display:flex;gap:0;border:1px solid var(--bd);border-radius:4px;overflow:hidden;width:fit-content;margin:8px 0 10px}
+.mode{font-size:14px;padding:5px 14px;border:none;background:#fff;cursor:pointer;border-right:1px solid var(--bd);font-family:var(--mn)}
+.mode:last-child{border-right:none}.mode.on{background:var(--a);color:#fff}
+button.go{padding:6px 20px;background:var(--a);color:#fff;border:none;border-radius:4px;font-size:16px;cursor:pointer;font-family:var(--mn)}
+button.go:hover{background:var(--a2)}
+.err{background:var(--wb);color:var(--w);border:1px solid var(--w);border-radius:4px;padding:6px 10px;font-family:var(--mn);font-size:14px;margin-top:8px;display:none}
+.err.on{display:block}
+#out{margin-top:16px}
+.c{background:#fff;border:1px solid var(--bd);border-radius:6px;padding:14px 16px;margin-bottom:12px}
+.ct{font-family:var(--mn);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#333;margin-bottom:10px}
+.s{border-left:3px solid var(--a3);padding-left:14px;margin-bottom:12px;font-size:16px;color:#111;line-height:1.9}
+.s .eq{display:block;font-family:var(--mn);font-size:15px;padding:3px 10px;margin:4px 0;background:var(--g);border-radius:3px}
+.s .hi{display:block;font-family:var(--mn);font-size:15px;padding:3px 10px;margin:4px 0;background:var(--a3);border-radius:3px;font-weight:600;color:var(--a)}
+code{font-family:var(--mn);background:var(--g2);padding:1px 5px;border-radius:3px;font-size:15px}
+/* parity calc table */
+.ptbl{font-family:var(--mn);font-size:15px;background:var(--g);border:1px solid var(--bd);border-radius:4px;padding:10px 14px;margin:8px 0;line-height:2}
+.pr{display:flex;gap:8px;align-items:baseline}
+.pl{font-size:13px;color:#333;min-width:200px}
+.pv{font-weight:500}.pv.res{color:var(--a);font-weight:700}
+.psep{border-top:1px solid var(--bd);margin:3px 0}
+/* lfsr table */
+.tw{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;font-family:var(--mn);font-size:15px;white-space:nowrap}
+th{background:#222;color:#fff;padding:5px 10px;font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;border-right:1px solid #444}
+th:last-child{border-right:none}
+td{padding:5px 10px;text-align:center;border-bottom:1px solid #e8e6df;border-right:1px solid #e8e6df}
+td:last-child{border-right:none}tr:last-child td{border-bottom:none}
+.lr td{background:var(--a3);color:var(--a);font-weight:600}
+.b1{color:#111;font-weight:700}.b0{color:#111;font-weight:700}
+/* mcq */
+.qi{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border:1px solid var(--bd);border-radius:4px;margin-bottom:6px}
+.qq{font-family:var(--mn);font-size:14px;color:#222}
+.qa{font-family:var(--mn);font-size:16px;font-weight:700;background:var(--g);padding:3px 10px;border-radius:3px;width:260px;text-align:left;display:inline-block}
+</style>
+</head>
+<body>
+<h2>Mã Vòng Tuyến Tính C(l, k) — Thuật toán nhân</h2>
+
+<!-- SOLVER -->
+<div id="ts">
+  <div class="c">
+    <div class="ct">Tham số đầu vào</div>
+    <div class="row">
+      <div class="f w60"><label>l</label><input id="l" type="number" value="7" min="2" max="63"></div>
+      <div class="f w60"><label>k</label><input id="k" type="number" value="4" min="1" max="62"></div>
+      <div class="f w260"><label>h(x) — bit MSB-first, dài k+1</label><input id="h" value="11101"></div>
+      <div class="f w260"><label>m — bản tin MSB-first, dài k</label><input id="m" value="1011"></div>
+    </div>
+    <div class="exs">
+      <button class="ex" onclick="le(7,4,'11101','1011')">C(7,4) h=11101 m=1011</button>
+      <button class="ex" onclick="le(7,4,'11101','1101')">C(7,4) h=11101 m=1101</button>
+      <button class="ex" onclick="le(7,4,'10111','1010')">C(7,4) h=10111 m=1010</button>
+      <button class="ex" onclick="le(15,7,'10001011','1010101')">C(15,7) h=10001011 m=1010101</button>
+    </div>
+    <div style="font-size:11px;color:#444;margin-bottom:4px;font-family:var(--mn)">CHẾ ĐỘ IN</div>
+    <div class="modes">
+      <button class="mode on" id="mf" onclick="sm('full')">Tự luận</button>
+      <button class="mode"    id="mm" onclick="sm('mcq')">Trắc nghiệm</button>
+    </div>
+    <button class="go" onclick="solve()">▶ Giải</button>
+    <div class="err" id="err"></div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<script>
+// ── Thuật toán nhân theo h(x) ────────────────────────────
+// h: mảng hệ số LSB-first h[0..k], h[0]=h_0 (coeff x^0)
+// m: chuỗi bit MSB-first, độ dài k
+// Trả về: { c, paritySteps }
+//   c: mảng bit từ mã c[0..l-1]
+//   paritySteps: mảng mô tả từng bước tính bit kiểm tra
+function multiplyAlgo(h, m, l, k) {
+  const r = l - k;
+  const c = new Array(l).fill(0);
+
+  // Bước 1: gán bản tin — a_i = m[i] (MSB-first, a0=m[0])
+  for (let i = 0; i < k; i++) c[r + i] = parseInt(m[i]);
+
+  // Bước 2: tính bit kiểm tra c[r-i] với i=1..r
+  const paritySteps = [];
+  for (let i = 1; i <= r; i++) {
+    const terms = [];
+    let val = 0;
+    for (let j = 0; j < k; j++) {
+      if (h[j]) { // chỉ lấy hạng tử h_j != 0
+        const idx = l - j - i;
+        terms.push({ j, idx, val: c[idx] });
+        val ^= c[idx];
+      }
+    }
+    c[r - i] = val;
+    paritySteps.push({ i, bitIdx: r - i, terms, val });
+  }
+  return { c, paritySteps };
+}
+
+// Kiểm tra c(x)*h(x) mod (x^l+1) = 0
+function verify(c, h, l) {
+  const prod = new Array(2 * l).fill(0);
+  for (let i = 0; i < l; i++)
+    for (let j = 0; j < h.length; j++)
+      prod[i + j] ^= c[i] & h[j];
+  // mod x^l + 1: x^l = 1
+  for (let i = 2 * l - 1; i >= l; i--)
+    prod[i - l] ^= prod[i];
+  return prod.slice(0, l).every(v => v === 0);
+}
+
+// LFSR mô phỏng theo h(x) — bảng A0..A(k-1), k thanh ghi
+// k hàng đầu: INP = m bit ngược, A0 = INP
+// l-k hàng sau: INP = "-", A0 = Σ h[j]*A_prev[k-1-j], j=0..k-1
+// A[i] (i>=1) = A[i-1] của hàng trước
+// OUT = A[0] của hàng hiện tại
+function buildDetailTable(h, m, l, k) {
+  const r = l - k;
+  const mRev = m.split('').reverse();
+  const rows = [];
+  let A = new Array(k).fill(0); // k thanh ghi A[0]..A[k-1]
+
+  for (let clk = 1; clk <= l; clk++) {
+    const prevA = [...A];
+    let inp, a0;
+    if (clk <= k) {
+      inp = parseInt(mRev[clk - 1]);
+      a0 = inp;
+    } else {
+      inp = null;
+      // A0 = Σ h[j] * A_prev[k-1-j], j=0..k-1
+      let val = 0;
+      for (let j = 0; j < k; j++) {
+        if (h[j]) val ^= prevA[k - 1 - j];
+      }
+      a0 = val;
+    }
+    const newA = new Array(k).fill(0);
+    newA[0] = a0;
+    for (let i = 1; i < k; i++) newA[i] = prevA[i - 1];
+    const out = newA[0]; // OUT = A[0] của hàng hiện tại
+    rows.push({ clk, inp, A: newA, prevA, out });
+    A = newA;
+  }
+  return rows;}
+
+// ── UI ───────────────────────────────────────────────────
+let mode = 'full';
+function sm(m) {
+  mode = m;
+  ['f','m'].forEach((x,i) =>
+    document.getElementById('m'+x).classList.toggle('on',
+      ['full','mcq'][i] === m));
+}
+function le(l,k,h,m) {
+  document.getElementById('l').value=l;
+  document.getElementById('k').value=k;
+  document.getElementById('h').value=h;
+  document.getElementById('m').value=m;
+}
+function se(msg) { const e=document.getElementById('err'); e.textContent='⚠ '+msg; e.classList.add('on'); }
+function he() { document.getElementById('err').classList.remove('on'); }
+function bs(arr) {
+  // arr: mảng bit c[0..l-1] hoặc chuỗi
+  const a = typeof arr==='string' ? arr.split('').map(Number) : arr;
+  return a.map(b=>`<span class="b${b}">${b}</span>`).join('');
+}
+function bss(s){ return s.split('').map(b=>`<span class="b${b}">${b}</span>`).join(''); }
+
+// ── Render: bảng chi tiết mạch nguyên lý lập mã ─────────
+function rLFSR(rows, r, h, parity, c, mStr, k) {
+  let html = `<div class="c"><div class="ct">Bảng mô tả hoạt động chi tiết của mạch nguyên lý lập mã</div>`;
+  html += `<div class="tw"><table><thead><tr>`;
+  html += `<th>CLK</th><th>INP</th>`;
+  for (let i = 0; i < k; i++) html += `<th>A<sub>${i}</sub></th>`;
+  html += `<th>OUT</th>`;
+  html += `</tr></thead><tbody>`;
+
+  const kRows = rows.filter(row => row.inp !== null).length;
+  rows.forEach((row, idx) => {
+    const isInputPhase = row.inp !== null;
+    const isSep = idx === kRows - 1;
+    html += `<tr${!isInputPhase ? ' class="lr"' : ''}>`;
+    html += `<td>${row.clk}</td>`;
+    html += `<td>${row.inp !== null ? `<span class="b${row.inp}">${row.inp}</span>` : '-'}</td>`;
+    for (let i = 0; i < k; i++) html += `<td class="b${row.A[i]}">${row.A[i]}</td>`;
+    html += `<td class="b${row.out}">${row.out}</td>`;
+    html += `</tr>`;
+    if (isSep) html += `<tr><td colspan="${k+3}" style="padding:0;border-bottom:2px solid #888"></td></tr>`;
+  });
+  html += `</tbody></table></div>`;
+  html += `</div>`;
+  return html;
+}
+
+// ── Render: bảng tính bit kiểm tra ──────────────────────
+function rParityCalc(paritySteps, h, hStr, l, r, k) {
+  let html = `<div class="ptbl">`;
+  html += `<div class="pr"><span class="pl">h(x) = ${hStr} (MSB-first)</span></div>`;
+  html += `<div class="pr"><span class="pl">h[j] LSB-first: h[0]=${h[0]}`;
+  for(let j=1;j<h.length;j++) html+=`, h[${j}]=${h[j]}`;
+  html+=`</span></div><div class="psep"></div>`;
+
+  paritySteps.forEach(step => {
+    // Viết công thức
+    const termStrs = step.terms.map(t =>
+      `h<sub>${t.j}</sub>·c<sub>${t.idx}</sub>(=${t.val})`
+    );
+    const formula = termStrs.length
+      ? termStrs.join(' ⊕ ')
+      : '0';
+    html += `<div class="pr">
+      <span class="pl">c<sub>${step.bitIdx}</sub> (i=${step.i}):</span>
+      <span class="pv">${formula} = <span class="res">${step.val}</span></span>
+    </div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+// ── Mode: Tự luận đầy đủ ────────────────────────────────
+function rFull(d) {
+  const { l, k, r, h, hStr, mStr, c, paritySteps, lfsrRows, ok } = d;
+  const parity = c.slice(0, r);
+  const vStr = c.join('');
+  let html = '';
+
+  // Tham số
+  html += `<div class="c"><div class="ct">Tham số mã C(${l},${k})</div><div class="s">
+    <span class="eq">l = ${l} (chiều dài từ mã)</span>
+    <span class="eq">k = ${k} (chiều dài bản tin)</span>
+    <span class="hi">r = l−k = ${r} (số bit kiểm tra)</span>
+    <span class="eq">h(x) = ${hStr} → h[j] LSB-first: [${h.join(',')}]</span>
+  </div></div>`;
+
+  // Bước 1
+  html += `<div class="c"><div class="ct">Bước 1 — Gán bản tin vào từ mã</div><div class="s">
+    Bản tin <code>m = ${mStr}</code> → a<sub>0</sub>=m[0]=${mStr[0]}, …, a<sub>${k-1}</sub>=m[${k-1}]=${mStr[k-1]}<br>
+    Gán: c<sub>${r}</sub>=a<sub>0</sub>, c<sub>${r+1}</sub>=a<sub>1</sub>, …, c<sub>${l-1}</sub>=a<sub>${k-1}</sub>
+    <span class="eq">Từ mã sau bước 1: [ ${'?'.repeat(r)} | ${mStr} ] = [ ${Array(r).fill('?').join('')} | ${mStr} ]</span>
+    <span class="hi">c[${r}..${l-1}] = ${bss(mStr)}</span>
+  </div></div>`;
+
+  // Bước 2
+  html += `<div class="c"><div class="ct">Bước 2 — Tính bit kiểm tra c<sub>r−i</sub> = Σ h<sub>j</sub>·c<sub>l−j−i</sub></div>
+  <div class="s">Công thức: với i=1..r, tính c<sub>r−i</sub> từ các bit đã biết</div>`;
+  html += rParityCalc(paritySteps, h, hStr, l, r, k);
+  html += `<div class="s" style="margin-top:6px">
+    <span class="hi">Bit kiểm tra: [c<sub>0</sub>..c<sub>${r-1}</sub>] = [${bss(parity.join(''))}]</span>
+  </div></div>`;
+
+  // Bước 3
+  html += `<div class="c"><div class="ct">Bước 3 — Thành lập từ mã hệ thống</div><div class="s">
+    Ghép [bit kiểm tra | bản tin]:
+    <span class="eq">c = [${parity.join('')} | ${mStr}]</span>
+    <span class="hi">v = ${bs(c)} (${l} bit)</span>
+  </div></div>`;
+
+  // Bảng LFSR
+  html += rLFSR(lfsrRows, r, h, parity, c, mStr, k);
+
+  // Kiểm tra
+  html += `<div class="c"><div class="ct">Kiểm tra — c(x)·h(x) mod (x<sup>${l}</sup>+1) = 0?</div><div class="s">
+    <span class="eq">c = ${bss(vStr)}</span>
+    <span class="hi" style="${ok?'':'background:var(--wb);color:var(--w)'}">
+      ${ok ? '✓ c(x)·h(x) ≡ 0 (mod x<sup>'+l+'</sup>+1) — Từ mã HỢP LỆ'
+           : '✗ Kiểm tra THẤT BẠI — Lỗi tính toán'}</span>
+  </div></div>`;
+  return html;
+}
+
+// ── Mode: Trắc nghiệm ───────────────────────────────────
+function rMCQ(d) {
+  const { l, k, r, h, hStr, mStr, c, ok } = d;
+  const parity = c.slice(0, r);
+  const items = [
+    [`h[j] LSB-first (j=0..k)`, `[${h.join(', ')}]`, ''],
+    [`Bit kiểm tra [c<sub>0</sub>..c<sub>${r-1}</sub>]`, parity.join(''), `(${r} bit)`],
+    [`Từ mã hệ thống v`, c.join(''), `(${l} bit)`],
+    [`Kiểm tra c·h≡0?`, ok?'Có — HỢP LỆ':'Không — LỖI', ''],
+  ];
+  let html = `<div class="c"><div class="ct">Đáp án — C(${l},${k}) | h=${hStr} | m=${mStr}</div>`;
+  items.forEach(([q,a,b]) =>
+    html+=`<div class="qi"><span class="qq">${q}</span><span class="qa">${a} <span style="font-weight:400;opacity:.6;font-size:10px">${b}</span></span></div>`);
+  return html + `</div>`;
+}
+
+// ── Solve ────────────────────────────────────────────────
+function solve() {
+  he();
+  document.getElementById('out').innerHTML = '';
+  const l = +document.getElementById('l').value;
+  const k = +document.getElementById('k').value;
+  const hStr = document.getElementById('h').value.trim();
+  const mStr = document.getElementById('m').value.trim();
+  const r = l - k;
+
+  // Validate
+  if (isNaN(l)||isNaN(k)||l<2||k<1||k>=l) return se(`l,k không hợp lệ: l=${l}, k=${k}`);
+  if (!/^[01]+$/.test(hStr)) return se('h(x) chỉ chứa 0 và 1');
+  if (hStr.length !== k+1) return se(`h(x) phải ${k+1} bit (bậc k=${k}), nhập ${hStr.length}`);
+  if (hStr[0]!=='1'||hStr[hStr.length-1]!=='1') return se('h(x): hệ số đầu và cuối phải = 1');
+  if (!/^[01]+$/.test(mStr)) return se('m chỉ chứa 0 và 1');
+  if (mStr.length !== k) return se(`m phải ${k} bit, nhập ${mStr.length}`);
+
+  // Parse h(x) → mảng hệ số LSB-first h[0..k]
+  // hStr là MSB-first: hStr[0]=hệ số x^k, hStr[k]=hệ số x^0
+  const h = hStr.split('').reverse().map(Number); // h[j]=coeff of x^j
+
+  // Thực hiện thuật toán nhân
+  const { c, paritySteps } = multiplyAlgo(h, mStr, l, k);
+
+  // Bảng chi tiết
+  const lfsrRows = buildDetailTable(h, mStr, l, k);
+
+  // Kiểm tra
+  const ok = verify(c, h, l);
+
+  const data = { l, k, r, h, hStr, mStr, c, paritySteps, lfsrRows, ok };
+  const out = document.getElementById('out');
+  out.innerHTML = mode==='full' ? rFull(data) : rMCQ(data);
+  out.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+</script>
+</body>
+</html>
