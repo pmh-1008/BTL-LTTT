@@ -257,7 +257,7 @@ function rFull(d) {
   html += `<div class="c"><div class="ct">Bước 1 — Gán bản tin vào từ mã</div><div class="s">
     Bản tin <code>m = ${mStr}</code> → a<sub>0</sub>=m[0]=${mStr[0]}, …, a<sub>${k-1}</sub>=m[${k-1}]=${mStr[k-1]}<br>
     Gán: c<sub>${r}</sub>=a<sub>0</sub>, c<sub>${r+1}</sub>=a<sub>1</sub>, …, c<sub>${l-1}</sub>=a<sub>${k-1}</sub>
-    <span class="eq">Từ mã sau bước 1: [ ${'?'.repeat(r)} | ${mStr} ] = [ ${Array(r).fill('?').join('')} | ${mStr} ]</span>
+    <span class="eq">Từ mã sau bước 1: [ ${'?'.repeat(r)} | ${mStr} ]</span>
     <span class="hi">c[${r}..${l-1}] = ${bss(mStr)}</span>
   </div></div>`;
 
@@ -273,7 +273,7 @@ function rFull(d) {
   html += `<div class="c"><div class="ct">Bước 3 — Thành lập từ mã hệ thống</div><div class="s">
     Ghép [bit kiểm tra | bản tin]:
     <span class="eq">c = [${parity.join('')} | ${mStr}]</span>
-    <span class="hi">v = ${bs(c)} (${l} bit)</span>
+    <span class="hi">c = ${bs(c)} (${l} bit)</span>
   </div></div>`;
 
   // Bảng LFSR
