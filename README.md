@@ -12,6 +12,7 @@ Triển khai C++17 của bộ mã hóa mã vòng tuyến tính C(l, k) với cá
 
 | Tệp/Thư mục | Mục Đích |
 |-----|---------|
+| `cyclic-code.html` | Chương trình mã hóa và in ra từng bước làm để có được đáp án cuối cùng với giao diện trực quan, sinh động |
 | `Bit.hpp` | Tạo lớp Bit đại diện cho 1 phần tử trong trường GF(2) và định nghĩa các thao tác trên Bit |
 | `BinaryVector.hpp` | Tạo lớp BinaryVector đại diện cho vector nhị phân độ dài cố định trên GF(2), đùng để biểu diễn bản tin, từ mã, ... |
 | `GF2Poly.hpp` | Tạo lớp GF2Poly đại diện cho đa thức trên GF(2) |
