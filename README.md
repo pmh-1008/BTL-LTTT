@@ -1,4 +1,4 @@
-# Bộ Mã Hóa Mã Vòng (Cyclic Code Encoder)
+# Bộ mã hóa mã vòng sử dụng thuật toán nhân (Cyclic Code Encoder)
 
 Triển khai C++17 của bộ mã hóa mã vòng tuyến tính C(l, k) với các phép toán đa thức trên trường GF(2).
 
@@ -6,20 +6,7 @@ Triển khai C++17 của bộ mã hóa mã vòng tuyến tính C(l, k) với cá
 
 - Thực hiện các phép tính toán trong trường GF(2)
 - Mã hóa bản tin thành từ mã hợp lệ
-- Biểu diễn hoạt động mạch LFSR (Linear Feedback Shift Register) từng xung nhịp
-
-## Thuật toán mã hóa
-
-Cho bản tin **m** độ dài k, đa thức kiểm tra **h(x)** độ dài l-k+1:
-
-```
-1. Tính g(x) = (x^l + 1) / h(x)           [đa thức sinh]
-2. Tính p(x) = (x^r · m(x)) mod g(x)      [bit parity, r=l-k]
-3. v(x) = x^r · m(x) + p(x)               [từ mã]
-4. Kiểm: v(x) mod g(x) = 0                [xác minh]
-```
-
-**Kết quả**: Từ mã v = [m | p] có độ dài l bit, chia hết cho g(x).
+- Biểu diễn hoạt động mạch mã hóa từng xung nhịp
 
 ## Các thành phần
 
@@ -55,13 +42,6 @@ m
 - `k`: Độ dài bản tin (bit)
 - `h(x)`: Đa thức kiểm tra (xâu nhị phân MSB-first, l-k+1 bit)
 - `m`: Bản tin (xâu nhị phân MSB-first, k bit)
-
-#### Đầu ra
-1. Bảng hoạt động LFSR (từng xung nhịp)
-2. g(x) = đa thức sinh
-3. p = bit parity
-4. v = từ mã
-5. Xác minh v % g(x) = 0
 
 
 ## Yêu Cầu
